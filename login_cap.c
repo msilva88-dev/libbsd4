@@ -1053,14 +1053,18 @@ expandstr(const char *ostr, const struct passwd *pwd, int ispath)
 				break;
 			if (op[1] != '/' && op[1] != '\0')
 				op += ulen;	/* ~username */
-			strlcpy(np, pwd->pw_dir, nlen);
+			//strlcpy(np, pwd->pw_dir, nlen);
+			strncpy(np, pwd->pw_dir, nlen - 1);
+			np[nlen - 1] = '\0';
 			nlen -= dlen;
 			np += dlen;
 			continue;
 		case '$':
 			if (pwd == NULL)
 				break;
-			strlcpy(np, pwd->pw_name, nlen);
+			//strlcpy(np, pwd->pw_name, nlen);
+			strncpy(np, pwd->pw_name, nlen - 1);
+			np[nlen - 1] = '\0';
 			nlen -= ulen;
 			np += ulen;
 			continue;

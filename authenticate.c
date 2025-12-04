@@ -230,7 +230,9 @@ auth_approval(auth_session_t *as, login_cap_t *lc, char *name, char *type)
 			return (0);
 		}
 		if (pwd == NULL && (approve = strchr(name, '.')) != NULL) {
-			strlcpy(path, name, sizeof path);
+			//strlcpy(path, name, sizeof path);
+			strncpy(path, name, sizeof path - 1);
+			path[sizeof path - 1] = '\0';
 			path[approve - name] = '\0';
 			getpwnam_r(name, &pwstore, pwbuf, sizeof(pwbuf), &pwd);
 		}
@@ -330,8 +332,12 @@ auth_usercheck(char *name, char *style, char *type, char *password)
 
 	if (!_auth_validuser(name))
 		return (NULL);
-	if (strlcpy(namebuf, name, sizeof(namebuf)) >= sizeof(namebuf))
+
+	//if (strlcpy(namebuf, name, sizeof(namebuf)) >= sizeof(namebuf))
+	if (strlen(name) >= sizeof(namebuf))
 		return (NULL);
+	strncpy(namebuf, name, sizeof(namebuf) - 1);
+	namebuf[sizeof(namebuf) - 1] = '\0';
 	name = namebuf;
 
 	/*
@@ -402,7 +408,9 @@ auth_userchallenge(char *name, char *style, char *type, char **challengep)
 		return (NULL);
 	if (strlen(name) >= sizeof(namebuf))
 		return (NULL);
-	strlcpy(namebuf, name, sizeof namebuf);
+	//strlcpy(namebuf, name, sizeof namebuf);
+	strncpy(namebuf, name, sizeof namebuf - 1);
+	namebuf[sizeof namebuf - 1] = '\0';
 	name = namebuf;
 
 	/*

@@ -1083,7 +1083,9 @@ _add_rmlist(auth_session_t *as, char *file)
 	}
 	rm->file = (char *)(rm + 1);
 	rm->next = as->rmlist;
-	strlcpy(rm->file, file, i);
+	//strlcpy(rm->file, file, i);
+	strncpy(rm->file, file, i - 1);
+	rm->file[i - 1] = '\0';
 	as->rmlist = rm;
 }
 
