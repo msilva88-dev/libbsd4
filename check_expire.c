@@ -46,7 +46,7 @@
 #include "bsd_auth.h"
 #include "login_cap.h"
 #include "pwd.h"
-#include "util_bsd4.h"
+#include "util.h"
 
 static char *pwd_update(const struct passwd *, const struct passwd *);
 

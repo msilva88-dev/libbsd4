@@ -59,14 +59,13 @@
 #include <fcntl.h>
 #include <limits.h>
 #include <paths.h>
-#include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <syslog.h>
 #include <unistd.h>
-#include "features.h"
 #include "login_cap.h"
+#include "pwd.h"
 
 static	char *_authtypes[] = { LOGIN_DEFSTYLE, 0 };
 static	char *expandstr(const char *, const struct passwd *, int);

@@ -44,7 +44,7 @@
 
 #include "features.h"
 
-#if USE_MUSLBSD
+#ifdef USE_MUSLBSD
 #include <pwd.h>
 #else
 
@@ -65,8 +65,10 @@ struct passwd {
 	time_t pw_expire; // bsd
 };
 
+void endpwent(void);
 int getpwnam_r(const char *, struct passwd *, char *, size_t, struct passwd **);
 int getpwuid_r(uid_t, struct passwd *, char *, size_t, struct passwd **);
+struct passwd *pw_dup(const struct passwd *);
 
 #ifdef __cplusplus
 }
