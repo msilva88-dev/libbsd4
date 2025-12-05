@@ -88,4 +88,6 @@ struct passwd *pw_dup(const struct passwd *);
 #define _PW_BUF_LEN 1024
 #endif
 
+int _bcrypt_autorounds(void) HIDDEN;
+
 #endif
