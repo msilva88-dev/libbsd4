@@ -41,7 +41,9 @@
 #include <err.h>
 #include <ctype.h>
 #include <stdlib.h>
-#include <db.h>
+#ifdef BSDDB
+#include <bsddb.h>
+#endif
 #ifdef YP
 #include <rpcsvc/ypclnt.h>
 #endif
@@ -55,7 +57,9 @@
 static const char _ngstar[] = "*";
 static struct netgroup *_nghead = (struct netgroup *)NULL;
 static struct netgroup *_nglist = (struct netgroup *)NULL;
+#ifdef BSDDB
 static DB *_ng_db;
+#endif
 
 /*
  * Simple string list
@@ -259,6 +263,7 @@ lookup(const char *ypdom, char *name, char **line, int bywhat)
 	char	*map = NULL;
 #endif
 
+#ifdef BSDDB
 	if (_ng_db) {
 		DBT	 key, data;
 		size_t	 len = strlen(name) + 2;
@@ -288,6 +293,8 @@ lookup(const char *ypdom, char *name, char **line, int bywhat)
 			return 0;
 		}
 	}
+#endif
+
 #ifdef YP
 	if (ypdom) {
 		switch (bywhat) {
@@ -610,10 +617,12 @@ endnetgrent(void)
 		free(_nglist);
 	}
 
+#ifdef BSDDB
 	if (_ng_db) {
 		(void) (_ng_db->close) (_ng_db);
 		_ng_db = NULL;
 	}
+#endif
 }
 DEF_WEAK(endnetgrent);
 
@@ -635,15 +644,21 @@ setnetgrent(const char *ng)
 	if (sl == NULL)
 		return;
 
+#ifdef BSDDB
 	if (_ng_db == NULL)
 		_ng_db = dbopen(_PATH_NETGROUP_DB, O_RDONLY, 0, DB_HASH, NULL);
+#endif
 
 #ifdef YP
 	/*
 	 * We use yp if there is a "+" in the netgroup file, or if there is
 	 * no netgroup file at all
 	 */
+#ifdef BSDDB
 	if (_ng_db == NULL || lookup(NULL, "+", &line, _NG_KEYBYNAME) == 0)
+#else
+	if (lookup(NULL, "+", &line, _NG_KEYBYNAME) == 0)
+#endif
 		yp_get_default_domain(&ypdom);
 	else
 		free(line);
@@ -684,17 +699,23 @@ innetgr(const char *grp, const char *host, const char *user, const char *domain)
 	int	 found;
 	struct stringlist *sl;
 
+#ifdef BSDDB
 	if (_ng_db == NULL)
 		_ng_db = dbopen(_PATH_NETGROUP_DB, O_RDONLY, 0, DB_HASH, NULL);
+#endif
 
 #ifdef YP
 	/*
 	 * We use yp if there is a "+" in the netgroup file, or if there is
 	 * no netgroup file at all
 	 */
+#ifdef BSDDB
 	if (_ng_db == NULL)
 		yp_get_default_domain(&ypdom);
 	else if (lookup(NULL, "+", &line, _NG_KEYBYNAME) == 0)
+#else
+	if (lookup(NULL, "+", &line, _NG_KEYBYNAME) == 0)
+#endif
 		yp_get_default_domain(&ypdom);
 
 	free(line);
