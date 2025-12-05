@@ -70,6 +70,10 @@ int getpwnam_r(const char *, struct passwd *, char *, size_t, struct passwd **);
 int getpwuid_r(uid_t, struct passwd *, char *, size_t, struct passwd **);
 struct passwd *pw_dup(const struct passwd *);
 
+/* internal code */
+int bcrypt_checkpass(const char *, const char *) HIDDEN;
+int bcrypt_newhash(const char *, int, char *, size_t) HIDDEN;
+
 #ifdef __cplusplus
 }
 #endif
