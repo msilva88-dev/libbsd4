@@ -24,6 +24,10 @@
 extern "C" {
 #endif
 
+char *cgetcap(char *, const char *, int) HIDDEN;
+int cgetent(char **, char **, const char *) HIDDEN;
+int cgetstr(char *, const char *, char **) HIDDEN;
+int cgetustr(char *, const char *, char **) HIDDEN;
 long long strtonum(const char *, long long, long long, const char **) HIDDEN;
 
 #ifdef __cplusplus
