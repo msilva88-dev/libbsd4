@@ -41,7 +41,11 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <time.h>
+#ifdef BLF
 #include "../blf.h"
+#else
+#include "blf_int.h"
+#endif
 #include "../pwd_int.h"
 #include "stdlib_int.h"
 #include "string_int.h"

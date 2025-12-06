@@ -43,21 +43,18 @@
  * Bruce Schneier.
  */
 
-#if 0
+#if defined(TEST) && defined(BLF)
 #include <stdio.h>		/* used for debugging */
 #include <string.h>
 #endif
 
 #include <sys/types.h>
+#if BLF
 #include "features.h"
 #include "blf.h"
-
-#undef inline
-#ifdef __GNUC__
-#define inline __inline
-#else				/* !__GNUC__ */
-#define inline
-#endif				/* !__GNUC__ */
+#else
+#include "portable/blf_int.h"
+#endif
 
 /* Function for Feistel Networks */
 
@@ -68,8 +65,12 @@
 
 #define BLFRND(s,p,i,j,n) (i ^= F(s,j) ^ (p)[n])
 
+#ifdef BLF
 DEF_WEAK(Blowfish_encipher);
 void
+#else
+static void
+#endif
 Blowfish_encipher(blf_ctx *c, u_int32_t *xl, u_int32_t *xr)
 {
 	u_int32_t Xl;
@@ -94,6 +95,7 @@ Blowfish_encipher(blf_ctx *c, u_int32_t *xl, u_int32_t *xr)
 	*xr = Xl;
 }
 
+#ifdef BLF
 DEF_WEAK(Blowfish_decipher);
 void
 Blowfish_decipher(blf_ctx *c, u_int32_t *xl, u_int32_t *xr)
@@ -119,6 +121,7 @@ Blowfish_decipher(blf_ctx *c, u_int32_t *xl, u_int32_t *xr)
 	*xl = Xr ^ p[0];
 	*xr = Xl;
 }
+#endif
 
 DEF_WEAK(Blowfish_initstate);
 void
@@ -504,6 +507,7 @@ Blowfish_expandstate(blf_ctx *c, const u_int8_t *data, u_int16_t databytes,
 
 }
 
+#ifdef BLF
 DEF_WEAK(blf_key);
 void
 blf_key(blf_ctx *c, const u_int8_t *k, u_int16_t len)
@@ -514,6 +518,7 @@ blf_key(blf_ctx *c, const u_int8_t *k, u_int16_t len)
 	/* Transform S-boxes and subkeys with key */
 	Blowfish_expand0state(c, k, len);
 }
+#endif
 
 DEF_WEAK(blf_enc);
 void
@@ -529,6 +534,7 @@ blf_enc(blf_ctx *c, u_int32_t *data, u_int16_t blocks)
 	}
 }
 
+#ifdef BLF
 DEF_WEAK(blf_dec);
 void
 blf_dec(blf_ctx *c, u_int32_t *data, u_int16_t blocks)
@@ -542,7 +548,9 @@ blf_dec(blf_ctx *c, u_int32_t *data, u_int16_t blocks)
 		d += 2;
 	}
 }
+#endif
 
+#ifdef BLF
 DEF_WEAK(blf_ecb_encrypt);
 void
 blf_ecb_encrypt(blf_ctx *c, u_int8_t *data, u_int32_t len)
@@ -565,7 +573,9 @@ blf_ecb_encrypt(blf_ctx *c, u_int8_t *data, u_int32_t len)
 		data += 8;
 	}
 }
+#endif
 
+#ifdef BLF
 DEF_WEAK(blf_ecb_decrypt);
 void
 blf_ecb_decrypt(blf_ctx *c, u_int8_t *data, u_int32_t len)
@@ -588,7 +598,9 @@ blf_ecb_decrypt(blf_ctx *c, u_int8_t *data, u_int32_t len)
 		data += 8;
 	}
 }
+#endif
 
+#ifdef BLF
 DEF_WEAK(blf_cbc_encrypt);
 void
 blf_cbc_encrypt(blf_ctx *c, u_int8_t *iv, u_int8_t *data, u_int32_t len)
@@ -614,7 +626,9 @@ blf_cbc_encrypt(blf_ctx *c, u_int8_t *iv, u_int8_t *data, u_int32_t len)
 		data += 8;
 	}
 }
+#endif
 
+#ifdef BLF
 DEF_WEAK(blf_cbc_decrypt);
 void
 blf_cbc_decrypt(blf_ctx *c, u_int8_t *iva, u_int8_t *data, u_int32_t len)
@@ -656,8 +670,9 @@ blf_cbc_decrypt(blf_ctx *c, u_int8_t *iva, u_int8_t *data, u_int32_t len)
 	for (j = 0; j < 8; j++)
 		data[j] ^= iva[j];
 }
+#endif
 
-#ifdef TEST
+#if defined(TEST) && defined(BLF)
 void
 report(u_int32_t data[], u_int16_t len)
 {
