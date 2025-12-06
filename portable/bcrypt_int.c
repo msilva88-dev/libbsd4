@@ -41,7 +41,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <time.h>
-//#include "../blf_int.h"
+#include "../blf.h"
 #include "../pwd_int.h"
 #include "stdlib_int.h"
 #include "string_int.h"
@@ -211,7 +211,7 @@ bcrypt_newhash(const char *pass, int log_rounds, char *hash, size_t hashlen)
 {
 	char salt[BCRYPT_SALTSPACE];
 
-	if (bcrypt_initsalt(log_rounds, salt, sizeof(salt)) != 0)
+	if (bcrypt_initsalt(log_rounds, (uint8_t)salt, sizeof(salt)) != 0)
 		return -1;
 
 	if (bcrypt_hashpass(pass, salt, hash, hashlen) != 0)
