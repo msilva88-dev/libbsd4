@@ -40,11 +40,11 @@
 #include <errno.h>
 #include <stdio.h>
 #include <stdint.h>
-#include <string.h>
 #include <time.h>
 //#include "../blf_int.h"
 #include "../pwd_int.h"
 #include "stdlib_int.h"
+#include "string_int.h"
 
 /* This implementation is adaptable to current computing power.
  * You can have up to 2^31 rounds which should be enough for some
