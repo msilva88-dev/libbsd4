@@ -211,7 +211,7 @@ bcrypt_newhash(const char *pass, int log_rounds, char *hash, size_t hashlen)
 {
 	char salt[BCRYPT_SALTSPACE];
 
-	if (bcrypt_initsalt(log_rounds, (uint8_t)salt, sizeof(salt)) != 0)
+	if (bcrypt_initsalt(log_rounds, (uint8_t *)salt, sizeof(salt)) != 0)
 		return -1;
 
 	if (bcrypt_hashpass(pass, salt, hash, hashlen) != 0)
