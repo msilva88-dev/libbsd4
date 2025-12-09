@@ -52,12 +52,12 @@ typedef struct BlowfishContext {
 	uint32_t P[BLF_N + 2];	/* Subkeys */
 } blf_ctx;
 
-void blf_enc(blf_ctx *, uint32_t *, uint16_t) HIDDEN;
-uint32_t Blowfish_stream2word(const uint8_t *, uint16_t , uint16_t *) HIDDEN;
-void Blowfish_expand0state(blf_ctx *, const uint8_t *, uint16_t) HIDDEN;
+void blf_enc(blf_ctx *, uint32_t *, uint16_t) HIDDEN_A;
+uint32_t Blowfish_stream2word(const uint8_t *, uint16_t , uint16_t *) HIDDEN_A;
+void Blowfish_expand0state(blf_ctx *, const uint8_t *, uint16_t) HIDDEN_A;
 void Blowfish_expandstate(blf_ctx *, const uint8_t *, uint16_t,
-	const uint8_t *, uint16_t) HIDDEN;
-void Blowfish_initstate(blf_ctx *) HIDDEN;
+	const uint8_t *, uint16_t) HIDDEN_A;
+void Blowfish_initstate(blf_ctx *) HIDDEN_A;
 
 #ifdef __cplusplus
 }

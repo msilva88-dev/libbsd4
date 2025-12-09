@@ -309,7 +309,7 @@ auth_challenge(auth_session_t *as)
 		return (NULL);
 
 	len = snprintf(path, sizeof(path), _PATH_AUTHPROG "%s", as->style);
-	if (len < 0 || len >= sizeof(path))
+	if (len < 0 || len >= (ssize_t)sizeof(path))
 		return (NULL);
 
 	as->state = 0;
@@ -530,13 +530,15 @@ auth_setoption(auth_session_t *as, char *n, char *v)
 	size_t len = strlen(n) + strlen(v) + 2;
 	int ret;
 
+	if (len > SSIZE_MAX) return(-1);
+
 	if ((opt = malloc(sizeof(*opt) + len)) == NULL)
 		return (-1);
 
 	opt->opt = (char *)(opt + 1);
 
 	ret = snprintf(opt->opt, len, "%s=%s", n, v);
-	if (ret < 0 || ret >= len) {
+	if (ret < 0 || ret >= (ssize_t)len) {
 		free(opt);
 		errno = ENAMETOOLONG;
 		return (-1);
@@ -826,7 +828,7 @@ auth_call(auth_session_t *as, char *path, ...)
 	int pfd[2];
 	int argc;
 	char *argv[64];		/* 64 args should be more than enough */
-#define	Nargc	(sizeof(argv)/sizeof(argv[0]))
+#define	Nargc	(ssize_t)(sizeof(argv)/sizeof(argv[0]))
 
 	va_start(as->ap0, path);
 
@@ -867,14 +869,14 @@ auth_call(auth_session_t *as, char *path, ...)
 	argv[argc] = NULL;
 
 	if (socketpair(PF_LOCAL, SOCK_STREAM, 0, pfd) == -1) {
-		syslog(LOG_ERR, "unable to create backchannel %m");
+		syslog(LOG_ERR, "unable to create backchannel %s", strerror(errno));
 		warnx("internal resource failure");
 		goto fail;
 	}
 
 	switch (pid = fork()) {
 	case -1:
-		syslog(LOG_ERR, "%s: %m", path);
+		syslog(LOG_ERR, "%s: %s", path, strerror(errno));
 		warnx("internal resource failure");
 		close(pfd[0]);
 		close(pfd[1]);
@@ -891,7 +893,7 @@ auth_call(auth_session_t *as, char *path, ...)
 		} else
 			closefrom_int(COMM_FD + 1);
 		execve(path, argv, auth_environ);
-		syslog(LOG_ERR, "%s: %m", path);
+		syslog(LOG_ERR, "%s: %s", path, strerror(errno));
 		err(1, "%s", path);
 	default:
 		close(pfd[1]);
@@ -1021,7 +1023,7 @@ _recv_fd(auth_session_t *as, int fd)
 	msg.msg_control = &cmsgbuf.buf;
 	msg.msg_controllen = sizeof(cmsgbuf.buf);
 	if (recvmsg(fd, &msg, 0) == -1)
-		syslog(LOG_ERR, "recvmsg: %m");
+		syslog(LOG_ERR, "recvmsg: %s", strerror(errno));
 	else if (msg.msg_flags & MSG_TRUNC)
 		syslog(LOG_ERR, "message truncated");
 	else if (msg.msg_flags & MSG_CTRUNC)
@@ -1052,7 +1054,7 @@ _auth_spool(auth_session_t *as, int fd)
 	ssize_t r;
 	char *b, *s;
 
-	for (s = as->spool + as->index; as->index < sizeof(as->spool) - 1; ) {
+	for (s = as->spool + as->index; as->index < (ssize_t)sizeof(as->spool) - 1; ) {
 		r = read(fd, as->spool + as->index,
 		    sizeof(as->spool) - as->index);
 		if (r <= 0) {
@@ -1090,14 +1092,16 @@ _add_rmlist(auth_session_t *as, char *file)
 	// XXX should rangecheck i since we are about to add?
 
 	if ((rm = malloc(sizeof(struct rmfiles) + i)) == NULL) {
-		syslog(LOG_ERR, "Failed to allocate rmfiles: %m");
+		syslog(LOG_ERR, "Failed to allocate rmfiles: %s", strerror(errno));
 		return;
 	}
 	rm->file = (char *)(rm + 1);
 	rm->next = as->rmlist;
 	//strlcpy(rm->file, file, i);
-	strncpy(rm->file, file, i - 1);
-	rm->file[i - 1] = '\0';
+	//strncpy(rm->file, file, i - 1);
+	//rm->file[i - 1] = '\0';
+	memcpy(rm->file, file, i);
+
 	as->rmlist = rm;
 }
 

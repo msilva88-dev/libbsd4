@@ -23,7 +23,7 @@ extern "C" {
 #include "bsd_auth.h"
 #include "features.h"
 
-int _auth_validuser(const char *) HIDDEN;
+int _auth_validuser(const char *) HIDDEN_A;
 
 #ifdef __cplusplus
 }

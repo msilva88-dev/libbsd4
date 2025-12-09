@@ -20,6 +20,6 @@
 #include <stdlib.h>
 #include "../features.h"
 
-void arc4random_buf(void *, size_t) HIDDEN;
+void arc4random_buf(void *, size_t) HIDDEN_A;
 
 #endif

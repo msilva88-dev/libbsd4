@@ -19,6 +19,6 @@
 #include <string.h>
 #include "../features.h"
 
-int timingsafe_bcmp(const void *, const void *, size_t) HIDDEN;
+int timingsafe_bcmp(const void *, const void *, size_t) HIDDEN_A;
 
 #endif

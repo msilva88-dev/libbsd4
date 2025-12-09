@@ -38,6 +38,7 @@
 #include <sys/stat.h>
 #include <ctype.h>
 #include <err.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
 #include <paths.h>
@@ -251,7 +252,7 @@ auth_approval(auth_session_t *as, login_cap_t *lc, char *name, char *type)
 			type += 8;
 
 		len = snprintf(path, sizeof(path), "approve-%s", type);
-		if (len < 0 || len >= sizeof(path)) {
+		if (len < 0 || len >= (ssize_t)sizeof(path)) {
 			if (close_lc_on_exit)
 				login_close(lc);
 			syslog(LOG_ERR, "approval path too long %.*s...",
@@ -276,7 +277,7 @@ auth_approval(auth_session_t *as, login_cap_t *lc, char *name, char *type)
 	if (as == NULL && (as = auth_open()) == NULL) {
 		if (close_lc_on_exit)
 			login_close(lc);
-		syslog(LOG_ERR, "%m");
+		syslog(LOG_ERR, "%s", strerror(errno));
 		warn(NULL);
 		free(approve);
 		return (0);
@@ -284,7 +285,7 @@ auth_approval(auth_session_t *as, login_cap_t *lc, char *name, char *type)
 
 	auth_setstate(as, AUTH_OKAY);
 	if (auth_setitem(as, AUTHV_NAME, name) < 0) {
-		syslog(LOG_ERR, "%m");
+		syslog(LOG_ERR, "%s", strerror(errno));
 		warn(NULL);
 		goto out;
 	}
@@ -475,7 +476,7 @@ auth_userresponse(auth_session_t *as, char *response, int more)
 	}
 
 	len = snprintf(path, sizeof(path), _PATH_AUTHPROG "%s", style);
-	if (len < 0 || len >= sizeof(path)) {
+	if (len < 0 || len >= (ssize_t)sizeof(path)) {
 		if (more == 0)
 			return (auth_close(as));
 		return (0);

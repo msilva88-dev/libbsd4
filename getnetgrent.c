@@ -49,11 +49,15 @@
 #include "features.h"
 #include "netgroup.h"
 
+#if defined(BSDDB) || defined(YP)
 #define _NG_STAR(s)	(((s) == NULL || *(s) == '\0') ? _ngstar : s)
+#endif
 #define _NG_EMPTY(s)	((s) == NULL ? "" : s)
 #define _NG_ISSPACE(p)	(isspace((unsigned char) (p)) || (p) == '\n')
 
+#if defined(BSDDB) || defined(YP)
 static const char _ngstar[] = "*";
+#endif
 static struct netgroup *_nghead = (struct netgroup *)NULL;
 static struct netgroup *_nglist = (struct netgroup *)NULL;
 #ifdef BSDDB
@@ -73,22 +77,30 @@ static struct stringlist *_ng_sl_init(void);
 static int	_ng_sl_add(struct stringlist *, char *);
 static void	_ng_sl_free(struct stringlist *, int);
 static char    *_ng_sl_find(struct stringlist *, char *);
+#if defined(BSDDB) || defined(YP)
 static char    *_ng_makekey(const char *, const char *, size_t);
+#endif
 static int	_ng_parse(char **, char **, struct netgroup **);
+#ifdef DEBUG_NG
 static void	_ng_print(char *, size_t, const struct netgroup *);
+#endif
 
 static int		getstring(char **, int, char **);
 static struct netgroup	*getnetgroup(char **);
+#if defined(BSDDB) || defined(YP)
 static int		 lookup(const char *, char *, char **, int);
+#endif
 static void		 addgroup(char *, struct stringlist *, char *);
 static int		 in_check(const char *, const char *,
 			    const char *, struct netgroup *);
 static int		 in_find(char *, struct stringlist *,
 			    char *, const char *, const char *, const char *);
+#if defined(BSDDB) || defined(YP)
 static char		*in_lookup1(const char *, const char *,
 			    const char *, int);
 static int		 in_lookup(const char *, const char *,
 			    const char *, const char *, int);
+#endif
 
 /*
  * _ng_sl_init(): Initialize a string list
@@ -243,6 +255,7 @@ badhost:
 	return NULL;
 }
 
+#if defined(BSDDB) || defined(YP)
 /*
  * lookup(): Find the given key in the database or yp, and return its value
  * in *line; returns 1 if key was found, 0 otherwise
@@ -250,10 +263,12 @@ badhost:
 static int
 lookup(const char *ypdom, char *name, char **line, int bywhat)
 {
-	int	ret;
+#ifdef BSDDB
+	int ret;
+#endif
 #ifdef YP
-	int	i;
-	char	*map = NULL;
+	int i;
+	char *map = NULL;
 #endif
 
 #ifdef BSDDB
@@ -312,6 +327,7 @@ lookup(const char *ypdom, char *name, char **line, int bywhat)
 
 	return 0;
 }
+#endif
 
 /*
  * _ng_parse(): Parse a line and return: _NG_ERROR: Syntax Error _NG_NONE:
@@ -362,7 +378,7 @@ _ng_parse(char **p, char **name, struct netgroup **ng)
 static void
 addgroup(char *ypdom, struct stringlist *sl, char *grp)
 {
-	char		*line, *p;
+	char		*line = NULL, *p;
 	struct netgroup	*ng;
 	char		*name;
 
@@ -380,9 +396,11 @@ addgroup(char *ypdom, struct stringlist *sl, char *grp)
 		return;
 	}
 
+#if defined(BSDDB) || defined(YP)
 	/* Lookup this netgroup */
 	if (!lookup(ypdom, grp, &line, _NG_KEYBYNAME))
 		return;
+#endif
 
 	p = line;
 
@@ -440,7 +458,7 @@ static int
 in_find(char *ypdom, struct stringlist *sl, char *grp, const char *host,
     const char *user, const char *domain)
 {
-	char		*line, *p;
+	char		*line = NULL, *p;
 	int		 i;
 	struct netgroup	*ng;
 	char		*name;
@@ -459,9 +477,11 @@ in_find(char *ypdom, struct stringlist *sl, char *grp, const char *host,
 		return 0;
 	}
 
+#if defined(BSDDB) || defined(YP)
 	/* Lookup this netgroup */
 	if (!lookup(ypdom, grp, &line, _NG_KEYBYNAME))
 		return 0;
+#endif
 
 	p = line;
 
@@ -500,6 +520,7 @@ in_find(char *ypdom, struct stringlist *sl, char *grp, const char *host,
 	}
 }
 
+#if defined(BSDDB) || defined(YP)
 /*
  * _ng_makekey(): Make a key from the two names given. The key is of the form
  * <name1>.<name2> Names strings are replaced with * if they are empty;
@@ -520,14 +541,18 @@ _ng_makekey(const char *s1, const char *s2, size_t len)
 
 	return buf;
 }
+#endif
 
+#ifdef DEBUG_NG
 static void
 _ng_print(char *buf, size_t len, const struct netgroup *ng)
 {
 	(void) snprintf(buf, len, "(%s,%s,%s)", _NG_EMPTY(ng->ng_host),
 	    _NG_EMPTY(ng->ng_user), _NG_EMPTY(ng->ng_domain));
 }
+#endif
 
+#if defined(BSDDB) || defined(YP)
 /*
  * in_lookup1(): Fast lookup for a key in the appropriate map
  */
@@ -547,7 +572,9 @@ in_lookup1(const char *ypdom, const char *key, const char *domain, int map)
 	free(ptr);
 	return res ? line : NULL;
 }
+#endif
 
+#if defined(BSDDB) || defined(YP)
 /*
  * in_lookup(): Fast lookup for a key in the appropriate map
  */
@@ -590,6 +617,7 @@ in_lookup(const char *ypdom, const char *group, const char *key,
 	free(line);
 	return 0;
 }
+#endif
 
 DEF_WEAK(endnetgrent);
 void
@@ -704,6 +732,7 @@ innetgr(const char *grp, const char *host, const char *user, const char *domain)
 	free(line);
 #endif
 
+#if defined(BSDDB) || defined(YP)
 	/* Try the fast lookup first */
 	if (host != NULL && user == NULL) {
 		if (in_lookup(ypdom, grp, host, domain, _NG_KEYBYHOST))
@@ -712,6 +741,7 @@ innetgr(const char *grp, const char *host, const char *user, const char *domain)
 		if (in_lookup(ypdom, grp, user, domain, _NG_KEYBYUSER))
 			return 1;
 	}
+#endif
 
 	/* Too bad need the slow recursive way */
 	sl = _ng_sl_init();

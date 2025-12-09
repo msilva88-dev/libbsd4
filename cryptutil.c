@@ -70,7 +70,7 @@ crypt_newhash(const char *pass, const char *pref, char *hash, size_t hashlen)
 	if (pref == NULL)
 		pref = defaultpref;
 
-	for (i = 0; i < maxchoice; i++) {
+	for (i = 0; i < (ssize_t)maxchoice; i++) {
 		const char *choice = choices[i];
 		size_t len = strlen(choice);
 		if (strcmp(pref, choice) == 0) {
@@ -90,7 +90,7 @@ crypt_newhash(const char *pass, const char *pref, char *hash, size_t hashlen)
 			break;
 		}
 	}
-	if (i == maxchoice) {
+	if (i == (ssize_t)maxchoice) {
 		errno = EINVAL;
 		goto err;
 	}

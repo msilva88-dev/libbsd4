@@ -19,11 +19,11 @@
 #ifdef MUSL_WITH_BSD
 #include <util.h>
 #else
-int pw_abort(void) HIDDEN;
-void pw_copy(int, int, const struct passwd *, const struct passwd *) HIDDEN;
-void pw_init(void) HIDDEN;
-int pw_lock(int) HIDDEN;
-int pw_mkdb(char *, int) HIDDEN;
+int pw_abort(void) HIDDEN_A;
+void pw_copy(int, int, const struct passwd *, const struct passwd *) HIDDEN_A;
+void pw_init(void) HIDDEN_A;
+int pw_lock(int) HIDDEN_A;
+int pw_mkdb(char *, int) HIDDEN_A;
 #endif
 
 #endif

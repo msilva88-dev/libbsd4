@@ -18,10 +18,14 @@
 
 #ifdef __GNUC__
 #define DEF_WEAK(x) extern __typeof(x) x __attribute__((weak, visibility("hidden")))
-#define HIDDEN __attribute__((__visibility__("hidden")))
+#define FALLTHROUGH_A __attribute__((__fallthrough__));
+#define HIDDEN_A __attribute__((__visibility__("hidden")))
+#define UNUSED_A __attribute__((__unused__))
 #else
 #define DEF_WEAK(x)
-#define HIDDEN
+#define FALLTHROUGH_A
+#define HIDDEN_A
+#define UNUSED_A
 #endif
 
 #endif

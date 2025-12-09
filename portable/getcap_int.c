@@ -59,7 +59,6 @@
 
 static size_t	 topreclen;	/* toprec length */
 static char	*toprec;	/* Additional record specified by cgetset() */
-static int	 gottoprec;	/* Flag indicating retrieval of toprecord */
 
 #ifdef BSDDB
 static int	cdbget(DB *, char **, const char *);
@@ -169,12 +168,14 @@ getent(char **cap, unsigned int *len, char **db_array, FILE *fp,
 {
 #ifdef BSDDB
 	DB *capdbp;
-#endif
-	char *r_end, *rp, **db_p;
-	int myfd, eof, foundit, opened, retval, clen;
-	char *record, *cbuf;
-	int tc_not_resolved;
+	char *r_end, *rp, **db_p, *record, *cbuf;
 	char pbuf[PATH_MAX];
+	int myfd, eof, foundit, opened, retval, clen;
+#else
+	char *r_end, *rp, **db_p, *record;
+	int myfd, eof, foundit, opened;
+#endif
+	int tc_not_resolved;
 
 	/*
 	 * Return with ``loop detected'' error if we've recursed more than

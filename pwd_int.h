@@ -72,8 +72,8 @@ int getpwuid_r(uid_t, struct passwd *, char *, size_t, struct passwd **);
 struct passwd *pw_dup(const struct passwd *);
 
 /* internal code */
-int bcrypt_checkpass(const char *, const char *) HIDDEN;
-int bcrypt_newhash(const char *, int, char *, size_t) HIDDEN;
+int bcrypt_checkpass(const char *, const char *) HIDDEN_A;
+int bcrypt_newhash(const char *, int, char *, size_t) HIDDEN_A;
 
 #ifdef __cplusplus
 }
@@ -93,6 +93,6 @@ int bcrypt_newhash(const char *, int, char *, size_t) HIDDEN;
 #define _PW_BUF_LEN 1024
 #endif
 
-int _bcrypt_autorounds(void) HIDDEN;
+int _bcrypt_autorounds(void) HIDDEN_A;
 
 #endif

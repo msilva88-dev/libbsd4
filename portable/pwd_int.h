@@ -82,7 +82,7 @@ extern "C" {
 #define _PATH_PWD_MKDB "/usr/sbin/pwd_mkdb"
 #endif
 
-void pw_error(const char *, int, int) HIDDEN;
+void pw_error(const char *, int, int) HIDDEN_A;
 
 #ifdef __cplusplus
 }

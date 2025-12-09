@@ -190,7 +190,7 @@ bcrypt_hashpass(const char *key, const char *salt, char *encrypted,
 	}
 
 
-	snprintf(encrypted, 8, "$2%c$%2.2u$", minor, logr);
+	snprintf(encrypted, 9, "$2%c$%2.2u$", minor, logr);
 	encode_base64(encrypted + 7, csalt, BCRYPT_MAXSALT);
 	encode_base64(encrypted + 7 + 22, ciphertext, 4 * BCRYPT_WORDS - 1);
 	explicit_bzero(&state, sizeof(state));
