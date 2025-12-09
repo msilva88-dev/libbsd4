@@ -17,7 +17,7 @@
 #define _LIBBSD4_FEATURES_INT_H
 
 #ifdef __GNUC__
-#define DEF_WEAK(x) extern __typeof(x) x __attribute__((weak, visibility("hidden")))
+#define DEF_WEAK(x) extern __typeof(x) x __attribute__((__weak__))
 #define FALLTHROUGH_A __attribute__((__fallthrough__));
 #define HIDDEN_A __attribute__((__visibility__("hidden")))
 #define UNUSED_A __attribute__((__unused__))
