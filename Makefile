@@ -224,7 +224,6 @@ DFT_COMPFLAGS += -fstack-protector-strong
 DFT_COMPFLAGS += -ffunction-sections
 DFT_COMPFLAGS += -fdata-sections
 DFT_COMPFLAGS += -fcf-protection=$(MCF_PROTECT_CMD)
-DFT_COMPFLAGS += -fvisibility=hidden
 #-feliminate-unused-debug-types
 DFT_COMPFLAGS_CMD != sh -c '\
 case "$(DEBUG)" in \
