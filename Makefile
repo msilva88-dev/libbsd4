@@ -28,7 +28,8 @@ DEBUG ?= false
 DESTDIR ?=
 DIRGRP ?= root
 DIROWN ?= root
-DIRPERM ?= 2755
+DIRPERM ?= 0755
+DIRPGRP ?= false
 ENABLE_BLF ?= false
 ENABLE_BSDDB ?= false
 ENABLE_SHARED ?= true
@@ -40,7 +41,7 @@ FILEPERM ?= 0644
 LD ?= $(LD_CMD)
 LDHSTYLE ?= both
 LDHSTYLE_LEG ?= gnu
-LIBDIR ?= $(PREFIX)/lib
+LIBDIR ?= lib
 LIBDGRP ?= $(DIRGRP)
 LIBDOWN ?= $(DIROWN)
 LIBDPERM ?= $(DIRPERM)
@@ -55,7 +56,7 @@ MANFGRP ?= $(FILEGRP)
 MANFOWN ?= $(FILEOWN)
 MANFPERM ?= $(FILEPERM)
 MARCH ?= $(MARCH_CMD)
-PREFIX ?=
+PREFIX ?= usr
 PFIXOWN ?= $(DIRGRP)
 PFIXGRP ?= $(DIROWN)
 PFIXPERM ?= $(DIRPERM)
@@ -503,9 +504,11 @@ install:
 	[ "$$2" = "$(PFIXGRP)" ] \
 	  || chgrp "$(PFIXGRP)" "$(DESTDIR)/$(PREFIX)"
 
-	LSPERMS="ls -ld \"$(DESTDIR)/$(PREFIX)\" 2>/dev/null"; \
-	PERMS=$("$${LSPERMS}" | awk '{print $1}' | cut -c6); \
-	[ "$(PERMS)" = "s" ] || chmod g+s "$(DESTDIR)/$(PREFIX)"
+	if [ "$(DIRPGRP)" = "true" ]; then \
+	    LSPERMS="ls -ld \"$(DESTDIR)/$(PREFIX)\" 2>/dev/null"; \
+	    PERMS=$("$${LSPERMS}" | awk '{print $1}' | cut -c6); \
+	    [ "$(PERMS)" = "s" ] || chmod g+s "$(DESTDIR)/$(PREFIX)"; \
+	fi
 
 	OGDIR="$(DESTDIR)/$(LIBDIR)"; \
 	OWNGRP=$$(ls -ld "$${OGDIR}" 2>/dev/null | awk '{print $$3, $$4}'); \
@@ -515,9 +518,11 @@ install:
 	[ "$$2" = "$(LIBDGRP)" ] \
 	  || chgrp "$(LIBDGRP)" "$(DESTDIR)/$(LIBDIR)"
 
-	LSPERMS="ls -ld \"$(DESTDIR)/$(LIBDIR)\" 2>/dev/null"; \
-	PERMS=$("$${LSPERMS}" | awk '{print $1}' | cut -c6); \
-	[ "$(PERMS)" = "s" ] || chmod g+s "$(DESTDIR)/$(LIBDIR)"
+	if [ "$(DIRPGRP)" = "true" ]; then \
+	    LSPERMS="ls -ld \"$(DESTDIR)/$(LIBDIR)\" 2>/dev/null"; \
+	    PERMS=$("$${LSPERMS}" | awk '{print $1}' | cut -c6); \
+	    [ "$(PERMS)" = "s" ] || chmod g+s "$(DESTDIR)/$(LIBDIR)"; \
+	fi
 
 	cp -p "$(BUILDDIR)/libbsd4."* "$(DESTDIR)/$(LIBDIR)"
 	chmod "$(LIBFPERM)" "$(DESTDIR)/$(LIBDIR)/"*
@@ -546,9 +551,11 @@ install-man: $(LIBBSD4_MANS)
 	[ "$$2" = "$(PFIXGRP)" ] \
 	  || chgrp "$(PFIXGRP)" "$(DESTDIR)/$(PREFIX)"
 
-	LSPERMS="ls -ld \"$(DESTDIR)/$(PREFIX)\" 2>/dev/null"; \
-	PERMS=$("$${LSPERMS}" | awk '{print $1}' | cut -c6); \
-	[ "$(PERMS)" = "s" ] || chmod g+s "$(DESTDIR)/$(PREFIX)"
+	if [ "$(DIRPGRP)" = "true" ]; then \
+	    LSPERMS="ls -ld \"$(DESTDIR)/$(PREFIX)\" 2>/dev/null"; \
+	    PERMS=$("$${LSPERMS}" | awk '{print $1}' | cut -c6); \
+	    [ "$(PERMS)" = "s" ] || chmod g+s "$(DESTDIR)/$(PREFIX)"; \
+	fi
 
 	OGDIR="$(DESTDIR)/$(SHAREDIR)"; \
 	OWNGRP=$$(ls -ld "$${OGDIR}" 2>/dev/null | awk '{print $$3, $$4}'); \
@@ -558,9 +565,11 @@ install-man: $(LIBBSD4_MANS)
 	[ "$$2" = "$(SHRDGRP)" ] \
 	  || chgrp "$(SHRDGRP)" "$(DESTDIR)/$(SHAREDIR)"
 
-	LSPERMS="ls -ld \"$(DESTDIR)/$(SHAREDIR)\" 2>/dev/null"; \
-	PERMS=$("$${LSPERMS}" | awk '{print $1}' | cut -c6); \
-	[ "$(PERMS)" = "s" ] || chmod g+s "$(DESTDIR)/$(SHAREDIR)"
+	if [ "$(DIRPGRP)" = "true" ]; then \
+	    LSPERMS="ls -ld \"$(DESTDIR)/$(SHAREDIR)\" 2>/dev/null"; \
+	    PERMS=$("$${LSPERMS}" | awk '{print $1}' | cut -c6); \
+	    [ "$(PERMS)" = "s" ] || chmod g+s "$(DESTDIR)/$(SHAREDIR)"; \
+	fi
 
 	OGDIR="$(DESTDIR)/$(MANDIR)"; \
 	OWNGRP=$$(ls -ld "$${OGDIR}" 2>/dev/null | awk '{print $$3, $$4}'); \
@@ -570,9 +579,11 @@ install-man: $(LIBBSD4_MANS)
 	[ "$$2" = "$(MANDGRP)" ] \
 	  || chgrp "$(MANDGRP)" "$(DESTDIR)/$(MANDIR)"
 
-	LSPERMS="ls -ld \"$(DESTDIR)/$(MANDIR)\" 2>/dev/null"; \
-	PERMS=$("$${LSPERMS}" | awk '{print $1}' | cut -c6); \
-	[ "$(PERMS)" = "s" ] || chmod g+s "$(DESTDIR)/$(MANDIR)"
+	if [ "$(DIRPGRP)" = "true" ]; then \
+	    LSPERMS="ls -ld \"$(DESTDIR)/$(MANDIR)\" 2>/dev/null"; \
+	    PERMS=$("$${LSPERMS}" | awk '{print $1}' | cut -c6); \
+	    [ "$(PERMS)" = "s" ] || chmod g+s "$(DESTDIR)/$(MANDIR)"; \
+	fi
 
 	OGDIR="$(DESTDIR)/$(MANDIR)/man3"; \
 	OWNGRP=$$(ls -ld "$${OGDIR}" 2>/dev/null | awk '{print $$3, $$4}'); \
@@ -582,9 +593,11 @@ install-man: $(LIBBSD4_MANS)
 	[ "$$2" = "$(MANDGRP)" ] \
 	  || chgrp "$(MANDGRP)" "$(DESTDIR)/$(MANDIR)/man3"
 
-	LSPERMS="ls -ld \"$(DESTDIR)/$(MANDIR)/man3\" 2>/dev/null"; \
-	PERMS=$("$${LSPERMS}" | awk '{print $1}' | cut -c6); \
-	[ "$(PERMS)" = "s" ] || chmod g+s "$(DESTDIR)/$(MANDIR)/man3"
+	if [ "$(DIRPGRP)" = "true" ]; then \
+	    LSPERMS="ls -ld \"$(DESTDIR)/$(MANDIR)/man3\" 2>/dev/null"; \
+	    PERMS=$("$${LSPERMS}" | awk '{print $1}' | cut -c6); \
+	    [ "$(PERMS)" = "s" ] || chmod g+s "$(DESTDIR)/$(MANDIR)/man3"; \
+	fi
 
 	cp -p $^ "$(DESTDIR)/$(MANDIR)/man3"
 	chmod "$(MANFPERM)" "$(DESTDIR)/$(MANDIR)/man3/"*
