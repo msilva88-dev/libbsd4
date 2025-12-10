@@ -60,7 +60,12 @@ case "$(COS_CMD)" in \
         printf "%s-pc-%s" "$(CARCH)" "hyperbolabsd" \
         ;; \
     *Linux|*) \
-        printf "%s-pc-%s" "$(CARCH)" "linux-gnu" \
+        _GLIBC=$(ldd --version 2>&1 | head -n 1 | cut -d"(" -f2 | cut -d")" -f1) \
+        if [ "${_GLIBC}" = "GNU libc" ]; then \
+            printf "%s-pc-%s" "$(CARCH)" "linux-gnu"; \
+        else \
+            printf "%s-pc-%s" "$(CARCH)" "linux-musl"; \
+        fi \
         ;; \
 esac \
 ' 2>/dev/null
