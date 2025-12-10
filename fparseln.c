@@ -30,7 +30,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* fparseln from OpenBSD 7.0 source code: lib/libutil/fparseln.c */
+/* fparseln code from OpenBSD 7.0 source code: lib/libutil/fparseln.c */
 
 #include <stdio.h>
 #include <string.h>

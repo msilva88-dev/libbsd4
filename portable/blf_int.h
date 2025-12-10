@@ -33,7 +33,10 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* blowfish internal header from OpenBSD 7.0 source code: include/blf.h */
+/*
+ * Portable blowfish internal header from OpenBSD 7.0 source code:
+ * include/blf.h
+ */
 
 #ifndef _LIBBSD4_PORTABLE_BLF_INT_H
 #define _LIBBSD4_PORTABLE_BLF_INT_H

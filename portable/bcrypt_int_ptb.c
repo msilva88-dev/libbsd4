@@ -18,7 +18,10 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* bcrypt internal from OpenBSD 7.0 source code: lib/libc/crypt/bcrypt.c */
+/*
+ * Portable bcrypt internal code from OpenBSD 7.0 source code:
+ * lib/libc/crypt/bcrypt.c
+ */
 
 /* This password hashing algorithm was designed by David Mazieres
  * <dm@lcs.mit.edu> and works as follows:

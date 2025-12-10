@@ -4,7 +4,10 @@ D. J. Bernstein
 Public domain.
 */
 
-/* chacha internal header from OpenBSD 7.0 source code: lib/libc/crypt/chacha_private.h */
+/*
+ * Portable chacha internal header from OpenBSD 7.0 source code:
+ * lib/libc/crypt/chacha_private.h
+ */
 
 typedef struct
 {

@@ -37,7 +37,10 @@
  * SUCH DAMAGE.
  */
 
-/* pwd portable internal header from OpenBSD 7.0 source code: include/pwd.h */
+/*
+ * Portable pwd internal header from OpenBSD 7.0 source code:
+ * include/pwd.h
+ */
 
 #ifndef _LIBBSD4_PORTABLE_PWD_INT_H
 #define _LIBBSD4_PORTABLE_PWD_INT_H

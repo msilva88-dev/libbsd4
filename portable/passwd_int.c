@@ -30,7 +30,10 @@
  * SUCH DAMAGE.
  */
 
-/* passwd internal from OpenBSD 7.0 source code: lib/libutil/passwd.c */
+/*
+ * Portable passwd internal code from OpenBSD 7.0 source code:
+ * lib/libutil/passwd.c
+ */
 
 #define _GNU_SOURCE
 #include <sys/stat.h>

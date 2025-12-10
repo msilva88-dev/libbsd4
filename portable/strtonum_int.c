@@ -18,7 +18,10 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* strtonum internal from OpenBSD 7.0 source code: lib/libc/stdlib/strtonum.c */
+/*
+ * Portable strtonum internal code from OpenBSD 7.0 source code:
+ * lib/libc/stdlib/strtonum.c
+ */
 
 #include <errno.h>
 #include <limits.h>

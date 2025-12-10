@@ -17,7 +17,10 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* timingsafe bcmp internal from OpenBSD 7.0 source code: lib/libc/string/timingsafe_bcmp.c */
+/*
+ * Portable timingsafe bcmp internal code from OpenBSD 7.0 source code:
+ * lib/libc/string/timingsafe_bcmp.c
+ */
 
 #include "string_int.h"
 

@@ -17,7 +17,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* cryptutil from OpenBSD 7.0 source code: lib/libc/crypt/cryptutil.c */
+/* cryptutil code from OpenBSD 7.0 source code: lib/libc/crypt/cryptutil.c */
 
 #include <string.h>
 #include <errno.h>

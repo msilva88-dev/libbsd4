@@ -34,7 +34,7 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* blowfish from OpenBSD 7.0 source code: lib/libc/crypt/blowfish.c */
+/* blowfish code from OpenBSD 7.0 source code: lib/libc/crypt/blowfish.c */
 
 /*
  * This code is derived from section 14.3 and the given source

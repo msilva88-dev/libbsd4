@@ -18,7 +18,10 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* bcrypt internal from OpenBSD 7.0 source code: lib/libc/crypt/bcrypt.c */
+/*
+ * bcrypt internal code from OpenBSD 7.0 source code:
+ * lib/libc/crypt/bcrypt.c
+ */
 
 #include <stdlib.h>
 #include <time.h>

@@ -32,7 +32,10 @@
  * SUCH DAMAGE.
  */
 
-/* getnetgrent from OpenBSD 7.0 source code: lib/libc/gen/getnetgrent.c */
+/*
+ * getnetgrent code from OpenBSD 7.0 source code:
+ * lib/libc/gen/getnetgrent.c
+ */
 
 #include <stdio.h>
 #include <string.h>

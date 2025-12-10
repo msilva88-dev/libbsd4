@@ -33,7 +33,10 @@
  * SUCH DAMAGE.
  */
 
-/* check_expire from OpenBSD 7.0 source code: lib/libutil/check_expire.c */
+/*
+ * check_expire code from OpenBSD 7.0 source code:
+ * lib/libutil/check_expire.c
+ */
 
 #include <errno.h>
 #include <fcntl.h>

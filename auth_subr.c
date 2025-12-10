@@ -49,7 +49,7 @@
  * SUCH DAMAGE.
  */
 
-/* auth_subr from OpenBSD 7.0 source code: lib/libc/gen/auth_subr.c */
+/* auth_subr code from OpenBSD 7.0 source code: lib/libc/gen/auth_subr.c */
 
 #include <sys/time.h>
 #include <sys/resource.h>

@@ -33,7 +33,10 @@
  * SUCH DAMAGE.
  */
 
-/* authenticate from OpenBSD 7.0 source code: lib/libc/gen/authenticate.c */
+/*
+ * authenticate code from OpenBSD 7.0 source code:
+ * lib/libc/gen/authenticate.c
+ */
 
 #include <sys/stat.h>
 #include <ctype.h>

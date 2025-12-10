@@ -33,7 +33,10 @@
  * SUCH DAMAGE.
  */
 
-/* getcap internal from OpenBSD 7.0 source code: lib/libc/gen/getcap.c */
+/*
+ * Portable getcap internal code from OpenBSD 7.0 source code:
+ * lib/libc/gen/getcap.c
+ */
 
 #include <ctype.h>
 #ifdef BSDDB

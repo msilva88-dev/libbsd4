@@ -20,9 +20,18 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* arc4random from OpenBSD 7.0 source code: lib/libc/crypt/arc4random.c */
-/* arc4random (_rs_allocate only) from OpenBSD 7.0 source code: lib/libc/crypt/arc4random.h */
-/* arc4random (_rs_allocate only) from OpenBSD 7.0 source code: lib/libcrypto/arc4random/arc4random_linux.h */
+/*
+ * Portable arc4random internal code from OpenBSD 7.0 source code:
+ * lib/libc/crypt/arc4random.c
+ */
+/*
+ * Part of arc4random internal header from OpenBSD 7.0 source code:
+ * lib/libc/crypt/arc4random.h
+ */
+/*
+ * Part of arc4random internal header from OpenBSD 7.0 source code:
+ * lib/libcrypto/arc4random/arc4random_linux.h
+ */
 
 /*
  * ChaCha based random number generator for OpenBSD.

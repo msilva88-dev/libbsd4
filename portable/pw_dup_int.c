@@ -21,7 +21,10 @@
  * Materiel Command, USAF, under agreement number F39502-99-1-0512.
  */
 
-/* pw_dup internal from OpenBSD 7.0 source code: lib/libc/gen/pw_dup.c */
+/*
+ * Portable pw_dup internal code from OpenBSD 7.0 source code:
+ * lib/libc/gen/pw_dup.c
+ */
 
 #include <stdlib.h>
 #include <stdio.h>
