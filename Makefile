@@ -25,20 +25,44 @@ CC ?= $(CC_CMD)
 CFLAGS ?= $(CFLAGS_CMD)
 CVER ?= gnu17
 DEBUG ?= false
-DESTDIR ?= /
+DESTDIR ?=
+DIRGRP ?= root
+DIROWN ?= root
+DIRPERM ?= 2755
 ENABLE_BLF ?= false
 ENABLE_BSDDB ?= false
 ENABLE_SHARED ?= true
 ENABLE_DYNAMIC ?= false
 ENABLE_YP ?= false
-GRPOWN ?= root
+FILEGRP ?= root
+FILEOWN ?= root
+FILEPERM ?= 0644
 LD ?= $(LD_CMD)
 LDHSTYLE ?= both
 LDHSTYLE_LEG ?= gnu
-LIBDIR ?= $(PREFIX)lib/
+LIBDIR ?= $(PREFIX)/lib
+LIBDGRP ?= $(DIRGRP)
+LIBDOWN ?= $(DIROWN)
+LIBDPERM ?= $(DIRPERM)
+LIBFGRP ?= $(FILEGRP)
+LIBFOWN ?= $(FILEOWN)
+LIBFPERM ?= $(FILEPERM)
+MANDIR ?= $(SHAREDIR)/man
+MANDGRP ?= $(DIRGRP)
+MANDOWN ?= $(DIROWN)
+MANDPERM ?= $(DIRPERM)
+MANFGRP ?= $(FILEGRP)
+MANFOWN ?= $(FILEOWN)
+MANFPERM ?= $(FILEPERM)
 MARCH ?= $(MARCH_CMD)
-PREFIX ?= $(DESTDIR)
-USROWN ?= root
+PREFIX ?=
+PFIXOWN ?= $(DIRGRP)
+PFIXGRP ?= $(DIROWN)
+PFIXPERM ?= $(DIRPERM)
+SHAREDIR ?= $(PREFIX)/share
+SHRDOWN ?= $(DIRGRP)
+SHRDGRP ?= $(DIROWN)
+SHRDPERM ?= $(DIRPERM)
 USE_LIBC_WITH_BSDLIB ?= $(USE_LIBC_WITH_BSDLIB_CMD)
 
 # Number of CPU threads for parallel compilation
@@ -417,6 +441,20 @@ LIBBSD4_OBJS += $(BUILDDIR)/check_expire.o $(BUILDDIR)/cryptutil.o
 LIBBSD4_OBJS += $(BUILDDIR)/fparseln.o $(BUILDDIR)/getnetgrent.o
 LIBBSD4_OBJS += $(BUILDDIR)/login_cap.o
 
+LIBBSD4_BLF_MAN_CMD != sh -c '\
+case "$(ENABLE_BLF)" in \
+    true) \
+        printf "%s" "blowfish.3" \
+        ;; \
+    false|*) \
+        printf "%s" "" \
+        ;; \
+esac \
+' 2>/dev/null
+LIBBSD4_MANS ::= authenticate.3 auth_subr.3 $(LIBBSD4_BLF_MAN_CMD)
+LIBBSD4_MANS += check_expire.3 crypt_checkpass.3 fparseln.3 getnetgrent.3
+LIBBSD4_MANS += login_cap.3
+
 ## build
 
 all: $(LIBS)
@@ -452,24 +490,109 @@ $(BUILDDIR)/portable/%.o: portable/%.c | $(BUILDDIR)/portable
 ## Install
 
 install:
-	[ -d "$(LIBDIR)" ] || mkdir -pm 2755 "$(LIBDIR)"
+	([ -d "$(DESTDIR)/$(PREFIX)" ] || [ "$(DESTDIR)/$(PREFIX)" = "/" ]) \
+	  || mkdir -pm "$(PFIXPERM)" "$(DESTDIR)/$(PREFIX)"
+	([ -d "$(DESTDIR)/$(LIBDIR)" ] || [ "$(DESTDIR)/$(LIBDIR)" = "/" ]) \
+	  || mkdir -pm "$(LIBDPERM)" "$(DESTDIR)/$(LIBDIR)"
 
-	USRGRP=$$(ls -ld "$(LIBDIR)" 2>/dev/null | awk '{print $$3, $$4}'); \
-	set -- $$USRGRP; \
-	[ "$$1" = "$(USROWN)" ] || chown "$(USROWN)" "$(LIBDIR)"; \
-	[ "$$2" = "$(GRPOWN)" ] || chgrp "$(GRPOWN)" "$(LIBDIR)"
+	OGDIR="$(DESTDIR)/$(PREFIX)"; \
+	OWNGRP=$$(ls -ld "$${OGDIR}" 2>/dev/null | awk '{print $$3, $$4}'); \
+	set -- "$${OWNGRP}"; \
+	[ "$$1" = "$(PFIXOWN)" ] \
+	  || chown "$(PFIXOWN)" "$(DESTDIR)/$(PREFIX)"; \
+	[ "$$2" = "$(PFIXGRP)" ] \
+	  || chgrp "$(PFIXGRP)" "$(DESTDIR)/$(PREFIX)"
 
-	LSPERMS="ls -ld \"$(LIBDIR)\" 2>/dev/null"; \
-	PERMS=$($LSPERMS | awk '{print $1}' | cut -c6); \
-	[ "$(PERMS)" = "s" ] || chmod g+s "$(LIBDIR)"
+	LSPERMS="ls -ld \"$(DESTDIR)/$(PREFIX)\" 2>/dev/null"; \
+	PERMS=$("$${LSPERMS}" | awk '{print $1}' | cut -c6); \
+	[ "$(PERMS)" = "s" ] || chmod g+s "$(DESTDIR)/$(PREFIX)"
 
-	cp -p libbsd4 "$(LIBDIR)"
-	chmod 0644 "$(BINDIR)"/*
-	chown "$(USROWN):$(GRPOWN)" "$(LIBDIR)"/*
+	OGDIR="$(DESTDIR)/$(LIBDIR)"; \
+	OWNGRP=$$(ls -ld "$${OGDIR}" 2>/dev/null | awk '{print $$3, $$4}'); \
+	set -- "$${OWNGRP}"; \
+	[ "$$1" = "$(LIBDOWN)" ] \
+	  || chown "$(LIBDOWN)" "$(DESTDIR)/$(LIBDIR)"; \
+	[ "$$2" = "$(LIBDGRP)" ] \
+	  || chgrp "$(LIBDGRP)" "$(DESTDIR)/$(LIBDIR)"
+
+	LSPERMS="ls -ld \"$(DESTDIR)/$(LIBDIR)\" 2>/dev/null"; \
+	PERMS=$("$${LSPERMS}" | awk '{print $1}' | cut -c6); \
+	[ "$(PERMS)" = "s" ] || chmod g+s "$(DESTDIR)/$(LIBDIR)"
+
+	cp -p "$(BUILDDIR)/libbsd4."* "$(DESTDIR)/$(LIBDIR)"
+	chmod "$(LIBFPERM)" "$(DESTDIR)/$(LIBDIR)/"*
+	chown "$(LIBFOWN):$(LIBFGRP)" "$(DESTDIR)/$(LIBDIR)/"*
+
+## Install Manuals
+
+install-man: $(LIBBSD4_MANS)
+	([ -d "$(DESTDIR)/$(PREFIX)" ] || [ "$(DESTDIR)/$(PREFIX)" = "/" ]) \
+	  || mkdir -pm "$(PFIXPERM)" "$(DESTDIR)/$(PREFIX)"
+	( \
+	    [ -d "$(DESTDIR)/$(SHAREDIR)" ] \
+	    || [ "$(DESTDIR)/$(SHAREDIR)" = "/" ] \
+	) \
+	  || mkdir -pm "$(SHRDPERM)" "$(DESTDIR)/$(SHAREDIR)"
+	([ -d "$(DESTDIR)/$(MANDIR)" ] || [ "$(DESTDIR)/$(MANDIR)" = "/" ]) \
+	  || mkdir -pm "$(MANDPERM)" "$(DESTDIR)/$(MANDIR)"
+	[ -d "$(DESTDIR)/$(MANDIR)/man3" ] \
+	  || mkdir -pm "$(MANDPERM)" "$(DESTDIR)/$(MANDIR)/man3"
+
+	OGDIR="$(DESTDIR)/$(PREFIX)"; \
+	OWNGRP=$$(ls -ld "$${OGDIR}" 2>/dev/null | awk '{print $$3, $$4}'); \
+	set -- "$${OWNGRP}"; \
+	[ "$$1" = "$(PFIXOWN)" ] \
+	  || chown "$(PFIXOWN)" "$(DESTDIR)/$(PREFIX)"; \
+	[ "$$2" = "$(PFIXGRP)" ] \
+	  || chgrp "$(PFIXGRP)" "$(DESTDIR)/$(PREFIX)"
+
+	LSPERMS="ls -ld \"$(DESTDIR)/$(PREFIX)\" 2>/dev/null"; \
+	PERMS=$("$${LSPERMS}" | awk '{print $1}' | cut -c6); \
+	[ "$(PERMS)" = "s" ] || chmod g+s "$(DESTDIR)/$(PREFIX)"
+
+	OGDIR="$(DESTDIR)/$(SHAREDIR)"; \
+	OWNGRP=$$(ls -ld "$${OGDIR}" 2>/dev/null | awk '{print $$3, $$4}'); \
+	set -- "$${OWNGRP}"; \
+	[ "$$1" = "$(SHRDOWN)" ] \
+	  || chown "$(SHRDOWN)" "$(DESTDIR)/$(SHAREDIR)"; \
+	[ "$$2" = "$(SHRDGRP)" ] \
+	  || chgrp "$(SHRDGRP)" "$(DESTDIR)/$(SHAREDIR)"
+
+	LSPERMS="ls -ld \"$(DESTDIR)/$(SHAREDIR)\" 2>/dev/null"; \
+	PERMS=$("$${LSPERMS}" | awk '{print $1}' | cut -c6); \
+	[ "$(PERMS)" = "s" ] || chmod g+s "$(DESTDIR)/$(SHAREDIR)"
+
+	OGDIR="$(DESTDIR)/$(MANDIR)"; \
+	OWNGRP=$$(ls -ld "$${OGDIR}" 2>/dev/null | awk '{print $$3, $$4}'); \
+	set -- "$${OWNGRP}"; \
+	[ "$$1" = "$(MANDOWN)" ] \
+	  || chown "$(MANDOWN)" "$(DESTDIR)/$(MANDIR)"; \
+	[ "$$2" = "$(MANDGRP)" ] \
+	  || chgrp "$(MANDGRP)" "$(DESTDIR)/$(MANDIR)"
+
+	LSPERMS="ls -ld \"$(DESTDIR)/$(MANDIR)\" 2>/dev/null"; \
+	PERMS=$("$${LSPERMS}" | awk '{print $1}' | cut -c6); \
+	[ "$(PERMS)" = "s" ] || chmod g+s "$(DESTDIR)/$(MANDIR)"
+
+	OGDIR="$(DESTDIR)/$(MANDIR)/man3"; \
+	OWNGRP=$$(ls -ld "$${OGDIR}" 2>/dev/null | awk '{print $$3, $$4}'); \
+	set -- "$${OWNGRP}"; \
+	[ "$$1" = "$(MANDOWN)" ] \
+	  || chown "$(MANDOWN)" "$(DESTDIR)/$(MANDIR)/man3"; \
+	[ "$$2" = "$(MANDGRP)" ] \
+	  || chgrp "$(MANDGRP)" "$(DESTDIR)/$(MANDIR)/man3"
+
+	LSPERMS="ls -ld \"$(DESTDIR)/$(MANDIR)/man3\" 2>/dev/null"; \
+	PERMS=$("$${LSPERMS}" | awk '{print $1}' | cut -c6); \
+	[ "$(PERMS)" = "s" ] || chmod g+s "$(DESTDIR)/$(MANDIR)/man3"
+
+	cp -p $^ "$(DESTDIR)/$(MANDIR)/man3"
+	chmod "$(MANFPERM)" "$(DESTDIR)/$(MANDIR)/man3/"*
+	chown "$(MANFOWN):$(MANFGRP)" "$(DESTDIR)/$(MANDIR)/man3/"*
 
 ## Clean
 
 clean:
 	rm -frv $(BUILDDIR)
 
-.PHONY: all clean install $(BINS)
+.PHONY: all clean install install-man $(LIBS)
