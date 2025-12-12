@@ -100,7 +100,7 @@ case "$(COS_CMD)" in \
         fi \
         ;; \
 esac \
-' 2>/dev/null
+' 2>/dev/null || true
 MARCH_CMD != sh -c '\
 uname -m 2>/dev/null | sed "s/_/-/" 2>/dev/null || printf "%s" "x86-64" \
 ' 2>/dev/null
@@ -156,22 +156,22 @@ case "$(USE_LIBC_WITH_BSDLIB)" in \
         ;; \
 esac \
 ' 2>/dev/null
-BUILD_PORTABLE ::= $(BUILD_PORTABLE_CMD)
+BUILD_PORTABLE := $(BUILD_PORTABLE_CMD)
 
 # Target library flags
 BUILD_LIBRARY_CMD != sh -c '\
 _DYNAMIC=""; \
 _STATIC=""; \
 _SP=""; \
-[ "$(ENABLE_DYNAMIC)" = "true" ] && _DYNAMIC="libbsd4_dynamic"; \
-[ "$(ENABLE_STATIC)" = "true" ] && _STATIC="libbsd4_static"; \
+[ "$(ENABLE_DYNAMIC)" = "true" ] && _DYNAMIC="$(BUILDDIR)/libbsd4.so"; \
+[ "$(ENABLE_STATIC)" = "true" ] && _STATIC="$(BUILDDIR)/libbsd4.a"; \
 if [ -z "$${_DYNAMIC}" ] && [ -z "$${_STATIC}" ]; then \
-    _DYNAMIC="libbsd4_dynamic"; \
+    _DYNAMIC="$(BUILDDIR)/libbsd4.so"; \
 fi; \
 [ -n "$${_DYNAMIC}" ] && _SP=" "; \
 printf "%s%s%s" "$${_DYNAMIC}" "$${_SP}" "$${_STATIC}" \
 ' 2>/dev/null
-BUILD_LIBRARY ::= $(BUILD_LIBRARY_CMD)
+BUILD_LIBRARY := $(BUILD_LIBRARY_CMD)
 
 # Default C compiler command flags
 AR_PATH_CMD != sh -c '\
@@ -200,17 +200,17 @@ LD_CMD != printf "%s" "$(LD_PATH_CMD)" | sed "s|.*/||" 2>/dev/null
 # Optional Feature Flags
 OPTFLAG_BLF_CMD != sh -c '\
 [ "$(ENABLE_BLF)" = "true" ] && printf "%s%s" '-D' "BLF"; \
-' 2>/dev/null
-OPTFLAG_BLF ::= $(OPTFLAG_BLF_CMD)
+' 2>/dev/null || true
+OPTFLAG_BLF := $(OPTFLAG_BLF_CMD)
 OPTFLAG_BSDDB_CMD != sh -c '\
 [ "$(ENABLE_BSDDB)" = "true" ] && printf "%s%s" '-D' "BSDDB"; \
-' 2>/dev/null
-OPTFLAG_BSDDB ::= $(OPTFLAG_BSDDB_CMD)
+' 2>/dev/null || true
+OPTFLAG_BSDDB := $(OPTFLAG_BSDDB_CMD)
 OPTFLAG_YP_CMD != sh -c '\
 [ "$(ENABLE_YP)" = "true" ] && printf "%s%s" '-D' "YP"; \
-' 2>/dev/null
-OPTFLAG_YP ::= $(OPTFLAG_YP_CMD)
-DFT_OPTFLAGS ::= $(OPTFLAG_BLF) $(OPTFLAG_BSDDB) $(OPTFLAG_YP)
+' 2>/dev/null || true
+OPTFLAG_YP := $(OPTFLAG_YP_CMD)
+DFT_OPTFLAGS := $(OPTFLAG_BLF) $(OPTFLAG_BSDDB) $(OPTFLAG_YP)
 
 # Set appropriate flags in clang v11, GCC v8 and Binutils as v2.34
 # (any language)
@@ -250,8 +250,8 @@ case "$(LD)" in \
         ;; \
 esac \
 ' 2>/dev/null
-DFT_GENFLAGS_LLVM ::= $(DFT_GENFLAGS_CMD) $(LD_GENFLAGS_LLVM_CMD)
-DFT_GENFLAGS_GCC ::= $(DFT_GENFLAGS_CMD)
+DFT_GENFLAGS_LLVM := $(DFT_GENFLAGS_CMD) $(LD_GENFLAGS_LLVM_CMD)
+DFT_GENFLAGS_GCC := $(DFT_GENFLAGS_CMD)
 DFT_GENFLAGS_GCC += -mtune=generic
 DFT_GENFLAGS_GCC += $(LD_GENFLAGS_GCC_CMD)
 DFT_GENFLAGS_GCC += -fno-plt
@@ -274,7 +274,7 @@ esac \
 ' 2>/dev/null
 
 # Compiler Flags in clang v11 and GCC v8 (any language)
-DFT_COMPFLAGS ::= $(DFT_OPTMFLAGS_CMD)
+DFT_COMPFLAGS := $(DFT_OPTMFLAGS_CMD)
 DFT_COMPFLAGS += -fno-common
 DFT_COMPFLAGS += -fstack-protector-strong
 DFT_COMPFLAGS += -ffunction-sections
@@ -295,7 +295,7 @@ esac \
 ' 2>/dev/null
 
 # Compiler Flags for shared library
-DFT_LIBFLAGS ::= -fPIC
+DFT_LIBFLAGS := -fPIC
 
 # Compiler Flags in clang v11 and GCC v8 (C family language)
 DFT_CFMLFLAGS_CMD != sh -c '\
@@ -317,7 +317,7 @@ case "$(CVER)" in \
         ;; \
 esac \
 ' 2>/dev/null
-DFT_CFLAGS ::= -fno-exceptions
+DFT_CFLAGS := -fno-exceptions
 
 # C Preprocessor Flags in clang v11, GCC v8 and Binutils as v2.34
 # (C family language)
@@ -330,10 +330,10 @@ case "$(DEBUG)" in \
         printf "-D%s=%d -D%s" "_FORTIFY_SOURCE" 2 "NDEBUG"; \
         ;; \
 esac \
-' 2>/dev/null
+' 2>/dev/null || true
 
 # Warning Flags
-DFT_WFLAGS ::= -Wall
+DFT_WFLAGS := -Wall
 DFT_WFLAGS += -Wextra
 DFT_WFLAGS += -Wimplicit-fallthrough
 DFT_WFLAGS += -Wpedantic
@@ -397,13 +397,13 @@ esac \
 ' 2>/dev/null
 
 # Linker Flags in Binutils ld.bfd/ld.gold v2.34, LLD v11 and mold v1
-DFT_LDFLAGS ::= $(DFT_GENLDFLAGS_CMD),$(DFT_OPTMFLAGS_CMD)
-DFT_LDFLAGS ::= $(DFT_LDFLAGS),-z,defs
-DFT_LDFLAGS ::= $(DFT_LDFLAGS),-z,noexecstack
-DFT_LDFLAGS ::= $(DFT_LDFLAGS),-z,now
-DFT_LDFLAGS ::= $(DFT_LDFLAGS),-z,relro
-DFT_LDFLAGS ::= $(DFT_LDFLAGS),--gc-sections
-DFT_LDFLAGS ::= $(DFT_LDFLAGS),--build-id
+DFT_LDFLAGS := $(DFT_GENLDFLAGS_CMD),$(DFT_OPTMFLAGS_CMD)
+DFT_LDFLAGS := $(DFT_LDFLAGS),-z,defs
+DFT_LDFLAGS := $(DFT_LDFLAGS),-z,noexecstack
+DFT_LDFLAGS := $(DFT_LDFLAGS),-z,now
+DFT_LDFLAGS := $(DFT_LDFLAGS),-z,relro
+DFT_LDFLAGS := $(DFT_LDFLAGS),--gc-sections
+DFT_LDFLAGS := $(DFT_LDFLAGS),--build-id
 DFT_LDFLAGS_CMD != sh -c '\
 case "$(DEBUG)" in \
     true) \
@@ -417,33 +417,33 @@ esac \
 ' 2>/dev/null
 
 # Linker Flags for shared code
-DFT_SHAREDLDFLAGS ::= -shared
+DFT_SHAREDLDFLAGS := -shared
 
 # Linker Flags
-LDFLAGS ::= $(DFT_LDFLAGS_CMD)
+LDFLAGS := $(DFT_LDFLAGS_CMD)
 
 ## Make macros
 
-LIBS ::= $(BUILD_LIBRARY)
+LIBS := $(BUILD_LIBRARY)
 
-COMMON_SRCS ::=
-PORTABLE_SRCS ::= portable/arc4random_int.c portable/bcrypt_int_ptb.c
+COMMON_SRCS :=
+PORTABLE_SRCS := portable/arc4random_int.c portable/bcrypt_int_ptb.c
 PORTABLE_SRCS += portable/getcap_int.c portable/passwd_int.c
 PORTABLE_SRCS += portable/pw_dup_int.c portable/strtonum_int.c
 PORTABLE_SRCS += portable/timingsafe_bcmp_int.c
-LIBBSD4_SRCS ::= authenticate.c auth_subr.c bcrypt_int.c blowfish.c
+LIBBSD4_SRCS := authenticate.c auth_subr.c bcrypt_int.c blowfish.c
 LIBBSD4_SRCS += check_expire.c cryptutil.c fparseln.c getnetgrent.c
 LIBBSD4_SRCS += login_cap.c
 
-COMMON_OBJS ::=
-PORTABLE_OBJS ::= $(BUILDDIR)/portable/arc4random_int.o
+COMMON_OBJS :=
+PORTABLE_OBJS := $(BUILDDIR)/portable/arc4random_int.o
 PORTABLE_OBJS += $(BUILDDIR)/portable/bcrypt_int_ptb.o
 PORTABLE_OBJS += $(BUILDDIR)/portable/getcap_int.o
 PORTABLE_OBJS += $(BUILDDIR)/portable/passwd_int.o
 PORTABLE_OBJS += $(BUILDDIR)/portable/pw_dup_int.o
 PORTABLE_OBJS += $(BUILDDIR)/portable/strtonum_int.o
 PORTABLE_OBJS += $(BUILDDIR)/portable/timingsafe_bcmp_int.o
-LIBBSD4_OBJS ::= $(BUILDDIR)/authenticate.o $(BUILDDIR)/auth_subr.o
+LIBBSD4_OBJS := $(BUILDDIR)/authenticate.o $(BUILDDIR)/auth_subr.o
 LIBBSD4_OBJS += $(BUILDDIR)/bcrypt_int.o $(BUILDDIR)/blowfish.o
 LIBBSD4_OBJS += $(BUILDDIR)/check_expire.o $(BUILDDIR)/cryptutil.o
 LIBBSD4_OBJS += $(BUILDDIR)/fparseln.o $(BUILDDIR)/getnetgrent.o
@@ -459,7 +459,7 @@ case "$(ENABLE_BLF)" in \
         ;; \
 esac \
 ' 2>/dev/null
-LIBBSD4_HDRS ::= $(LIBBSD4_BLF_HDR_CMD) bsd_auth.h netgroup.h login_cap.h
+LIBBSD4_HDRS := $(LIBBSD4_BLF_HDR_CMD) bsd_auth.h netgroup.h login_cap.h
 LIBBSD4_HDRS += unistd_bsd4.h util_bsd4.h
 
 LIBBSD4_BLF_MAN_CMD != sh -c '\
@@ -472,43 +472,66 @@ case "$(ENABLE_BLF)" in \
         ;; \
 esac \
 ' 2>/dev/null
-LIBBSD4_MANS ::= authenticate.3 auth_subr.3 $(LIBBSD4_BLF_MAN_CMD)
+LIBBSD4_MANS := authenticate.3 auth_subr.3 $(LIBBSD4_BLF_MAN_CMD)
 LIBBSD4_MANS += check_expire.3 crypt_checkpass.3 fparseln.3 getnetgrent.3
 LIBBSD4_MANS += login_cap.3
 
 ## build
 
-all: $(LIBS)
+all: $(BUILDDIR) $(BUILDDIR)/portable $(LIBS)
 
-libbsd4_dynamic: $(LIBBSD4_OBJS) $(COMMON_OBJS) $(PORTABLE_OBJS)
+$(BUILDDIR):
+	mkdir -p "$(BUILDDIR)"
+$(BUILDDIR)/portable:
+	mkdir -p "$(BUILDDIR)/portable"
+$(BUILDDIR)/authenticate.o: authenticate.c
+	$(CC) $(CFLAGS) $(DFT_LIBFLAGS) -c $? -o $@
+$(BUILDDIR)/auth_subr.o: auth_subr.c
+	$(CC) $(CFLAGS) $(DFT_LIBFLAGS) -c $? -o $@
+$(BUILDDIR)/bcrypt_int.o: bcrypt_int.c
+	$(CC) $(CFLAGS) $(DFT_LIBFLAGS) -c $? -o $@
+$(BUILDDIR)/blowfish.o: blowfish.c
+	$(CC) $(CFLAGS) $(DFT_LIBFLAGS) -c $? -o $@
+$(BUILDDIR)/check_expire.o: check_expire.c
+	$(CC) $(CFLAGS) $(DFT_LIBFLAGS) -c $? -o $@
+$(BUILDDIR)/cryptutil.o: cryptutil.c
+	$(CC) $(CFLAGS) $(DFT_LIBFLAGS) -c $? -o $@
+$(BUILDDIR)/fparseln.o: fparseln.c
+	$(CC) $(CFLAGS) $(DFT_LIBFLAGS) -c $? -o $@
+$(BUILDDIR)/getnetgrent.o: getnetgrent.c
+	$(CC) $(CFLAGS) $(DFT_LIBFLAGS) -c $? -o $@
+$(BUILDDIR)/login_cap.o: login_cap.c
+	$(CC) $(CFLAGS) $(DFT_LIBFLAGS) -c $? -o $@
+$(BUILDDIR)/portable/arc4random_int.o: portable/arc4random_int.c
+	$(CC) $(CFLAGS) $(DFT_LIBFLAGS) -c $? -o $@
+$(BUILDDIR)/portable/bcrypt_int_ptb.o: portable/bcrypt_int_ptb.c
+	$(CC) $(CFLAGS) $(DFT_LIBFLAGS) -c $? -o $@
+$(BUILDDIR)/portable/getcap_int.o: portable/getcap_int.c
+	$(CC) $(CFLAGS) $(DFT_LIBFLAGS) -c $? -o $@
+$(BUILDDIR)/portable/passwd_int.o: portable/passwd_int.c
+	$(CC) $(CFLAGS) $(DFT_LIBFLAGS) -c $? -o $@
+$(BUILDDIR)/portable/pw_dup_int.o: portable/pw_dup_int.c
+	$(CC) $(CFLAGS) $(DFT_LIBFLAGS) -c $? -o $@
+$(BUILDDIR)/portable/strtonum_int.o: portable/strtonum_int.c
+	$(CC) $(CFLAGS) $(DFT_LIBFLAGS) -c $? -o $@
+$(BUILDDIR)/portable/timingsafe_bcmp_int.o: portable/timingsafe_bcmp_int.c
+	$(CC) $(CFLAGS) $(DFT_LIBFLAGS) -c $? -o $@
+$(BUILDDIR)/libbsd4.so: $(LIBBSD4_OBJS) $(COMMON_OBJS) $(PORTABLE_OBJS)
 	if [ "$(BUILD_PORTABLE)" = "true" ]; then \
 	    $(CC) $(LDFLAGS) $(DFT_LIBFLAGS) $(DFT_SHAREDLDFLAGS) \
-	      -o "$(BUILDDIR)/libbsd4.so" $^; \
+	      -o "$(BUILDDIR)/libbsd4.so" $?; \
 	else \
 	    $(CC) $(LDFLAGS) $(DFT_LIBFLAGS) $(DFT_SHAREDLDFLAGS) \
 	      -o "$(BUILDDIR)/libbsd4.so" \
               $(LIBBSD4_OBJS) $(COMMON_OBJS); \
 	fi
-
-libbsd4_static: $(LIBBSD4_OBJS) $(COMMON_OBJS) $(PORTABLE_OBJS)
+$(BUILDDIR)/libbsd4.a: $(LIBBSD4_OBJS) $(COMMON_OBJS) $(PORTABLE_OBJS)
 	if [ "$(BUILD_PORTABLE)" = "true" ]; then \
-	    $(AR) $(ARFLAGS) "$(BUILDDIR)/libbsd4.a" $^; \
+	    $(AR) $(ARFLAGS) "$(BUILDDIR)/libbsd4.a" $?; \
 	else \
 	    $(AR) $(ARFLAGS) "$(BUILDDIR)/libbsd4.a" \
               $(LIBBSD4_OBJS) $(COMMON_OBJS); \
 	fi
-
-$(BUILDDIR):
-	mkdir -p "$(BUILDDIR)"
-
-$(BUILDDIR)/%.o: %.c | $(BUILDDIR)
-	$(CC) $(CFLAGS) $(DFT_LIBFLAGS) -c $< -o $@
-
-$(BUILDDIR)/portable:
-	mkdir -p "$(BUILDDIR)/portable"
-
-$(BUILDDIR)/portable/%.o: portable/%.c | $(BUILDDIR)/portable
-	$(CC) $(CFLAGS) $(DFT_LIBFLAGS) -c $< -o $@
 
 ## Install
 
